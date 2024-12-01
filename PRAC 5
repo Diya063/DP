@@ -1,0 +1,29 @@
+import random
+
+def generate_password(num_words=4):
+    # Predefined list of dictionary words
+    words = [
+        "apple", "banana", "cherry", "date", "elderberry", 
+        "fig", "grape", "honeydew", "kiwi", "lemon", 
+        "mango", "nectarine", "orange", "papaya", "pear", 
+        "quince", "raspberry", "strawberry", "tangerine", "watermelon"
+    ]
+    
+    # Ensure there are enough words in the list
+    if num_words > len(words):
+        print("The word list does not contain enough words!")
+        return None
+    
+    # Randomly select words from the list
+    selected_words = random.sample(words, num_words)
+    
+    # Combine the words to create a password
+    password = ''.join(selected_words)  # You can customize with separators like '-'.join
+    return password
+
+# Example usage
+if __name__ == "__main__":
+    num_words = int(input("Enter the number of words for the password: "))
+    password = generate_password(num_words)
+    if password:
+        print(f"Generated Password: {password}")
