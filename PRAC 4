@@ -1,0 +1,38 @@
+import requests
+import hashlib
+
+def check_password_leak(password):
+    # Convert password to SHA-1 hash
+    sha1_hash = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+    
+    # First 5 characters of the SHA-1 hash to query the API
+    prefix = sha1_hash[:5]
+    suffix = sha1_hash[5:]
+    
+    # Send request to the "Have I Been Pwned" API
+    url = f"https://api.pwnedpasswords.com/range/{prefix}"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        # Check if the suffix is in the response (list of hashes that match the prefix)
+        hashes = response.text.splitlines()
+        for line in hashes:
+            hash_suffix, count = line.split(':')
+            if hash_suffix == suffix:
+                return True, count  # Password has been pwned and this many times
+    return False, 0  # Password has not been pwned
+
+def check_passwords_from_file(file_name):
+    with open(file_name, 'r') as file:
+        for line in file:
+            username, password = line.strip().split(',')
+            is_leaked, count = check_password_leak(password)
+            if is_leaked:
+                print(f"Password for user '{username}' has been leaked {count} times!")
+            else:
+                print(f"Password for user '{username}' is safe.")
+
+# Example usage
+if __name__ == "__main__":
+    file_name = input("Enter the file name containing usernames and passwords: ")
+    check_passwords_from_file(file_name)
